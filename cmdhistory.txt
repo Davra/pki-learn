@@ -1,0 +1,67 @@
+2020  openssl req -new     -config etc/root-ca.conf     -out ca/root-ca.csr     -keyout ca/root-ca/private/root-ca.key
+ 2021  openssl ca -selfsign     -config etc/root-ca.conf     -in ca/root-ca.csr     -out ca/root-ca.crt     -extensions root_ca_ext
+ 2027  openssl req -new     -config etc/signing-ca.conf     -out ca/signing-ca.csr     -keyout ca/signing-ca/private/signing-ca.key
+ 2028  openssl ca     -config etc/root-ca.conf     -in ca/signing-ca.csr     -out ca/signing-ca.crt     -extensions signing_ca_ext
+ 2029  openssl req -new     -config etc/email.conf     -out certs/fred.csr     -keyout certs/fred.key
+ 2030  openssl ca     -config etc/signing-ca.conf     -in certs/fred.csr     -out certs/fred.crt     -extensions email_ext
+ 2031  SAN=DNS:www.simple.org openssl req -new     -config etc/server.conf     -out certs/simple-org.csr     -keyout certs/simple-org.key
+ 2032  openssl ca     -config etc/signing-ca.conf     -in certs/simple-org.csr     -out certs/simple-org.crt     -extensions server_ext
+ 2034  openssl ca     -config etc/signing-ca.conf     -revoke ca/signing-ca/55F5668FB56709436B67F3786F3DA6AE6FD5158D.pem     -crl_reason superseded
+ 2035  openssl ca -gencrl     -config etc/signing-ca.conf     -out crl/signing-ca.crl
+ 2036  openssl x509     -in certs/fred.crt     -out certs/fred.cer     -outform der
+ 2037  openssl crl     -in crl/signing-ca.crl     -out crl/signing-ca.crl     -outform der
+ 2038  openssl crl2pkcs7 -nocrl     -certfile ca/signing-ca.crt     -certfile ca/root-ca.crt     -out ca/signing-ca-chain.p7c     -outform der
+ 2039  openssl pkcs12 -export     -name "Fred Flintstone"     -in certs/fred.crt     -inkey certs/fred.key     -out certs/fred.p12
+ 2042  openssl req     -in certs/fred.csr     -noout     -text
+ 2043  openssl x509     -in certs/fred.crt     -noout     -text
+ 2044  openssl crl     -in crl/signing-ca.crl     -inform der     -noout     -text
+ 2045  openssl pkcs7     -in ca/signing-ca-chain.p7c     -inform der     -noout     -text     -print_certs
+ 2046  openssl pkcs12     -in certs/fred.p12     -nodes     -info
+ 2052  openssl x509 -in simple-org.crt -noout -text
+ 2058  openssl s_client --help
+ 2059  openssl s_client -showcerts localhost:5555
+ 2060  openssl s_client -verify_hostname localhost:5555
+ 2061  openssl s_client -showcerts localhost:5555
+ 2062  openssl s_client -verify_hostname localhost:5555
+ 2063  openssl s_client --help
+ 2064  openssl s_client -verify_hostname -servername www.simple.org localhost:5555
+ 2065  openssl s_client --help | grep SNI
+ 2066  openssl s_client  -servername www.simple.org localhost:5555
+ 2067  openssl s_client -verify_hostname -servername www.simple.org localhost:5555
+ 2068  openssl s_client -showcerts -servername www.simple.org localhost:5555
+ 2072  openssl s_client -showcerts -servername www.simple.org -cert ./certs/fred.crt -key ./certs/fred.key localhost:5555
+ 2073  openssl s_client --help
+ 2074  openssl s_client -showcerts -servername www.simple.org -cert ./certs/fred.crt -key ./certs/fred.key -CAFile ca/root-ca.crt localhost:5555
+ 2075  openssl s_client -showcerts -servername www.simple.org -cert ./certs/fred.crt -key ./certs/fred.key -CAfile ca/root-ca.crt localhost:5555
+ 2087  openssl s_client -showcerts -servername www.simple.org -cert ./certs/fred.crt -key ./certs/fred.key -CAfile ca/root-ca.crt localhost:5555
+ 2088  openssl s_client  -servername www.simple.org -cert ./certs/fred.crt -key ./certs/fred.key -CAfile ca/root-ca.crt localhost:5555
+ 2093  openssl s_client  -servername www.simple.org -cert ./certs/fred.crt -key ./certs/fred.key -CAfile ca/root-ca.crt localhost:5555
+ 2099  openssl crl     -in crl/signing-ca.crl     -out crl/signing-ca.crl     -outform pem
+ 2101  openssl crl     -in crl/signing-ca.crl     -out crl/signing-ca.crl     -outform pem
+ 2103  openssl crl -in crl/signing-ca.crl -noout -text
+ 2104  openssl s_client  -servername www.simple.org -cert ./certs/fred.crt -key ./certs/fred.key -CAfile ca/root-ca.crt localhost:5555
+ 2105  openssl s_client  -servername www.simple.org -cert ./certs/fred.crt -key ./certs/fred.key -CAfile ca/root-ca.crt -prexit localhost:5555
+ 2106  openssl s_client --help
+ 2107  openssl s_client  -servername www.simple.org -cert ./certs/fred.crt -key ./certs/fred.key -CAfile ca/root-ca.crt -prexit localhost:5555
+ 2108  openssl req -new --config etc/email.conf -out certs/fred_new.csr -key certs/fred.key 
+ 2109  openssl ca -config etc/signing-ca.conf -in certs/fred_new.csr -out certs/fred_new.crt -extensions email_ext
+ 2110  openssl s_client  -servername www.simple.org -cert ./certs/fred_new.crt -key ./certs/fred.key -CAfile ca/root-ca.crt -prexit localhost:5555
+ 2111  openssl s_client  -servername www.simple.org -cert ./certs/fred.crt -key ./certs/fred.key -CAfile ca/root-ca.crt -prexit localhost:5555
+ 2112  openssl s_client  -servername www.simple.org -cert ./certs/fred_new.crt -key ./certs/fred.key -CAfile ca/root-ca.crt -prexit localhost:5555
+ 2114  openssl crl -in crl/signing-ca.crl -noout -text
+ 2118  openssl s_client  -servername www.simple.org -cert ./certs/fred_new.crt -key ./certs/fred.key -CAfile ca/root-ca.crt -prexit localhost:5555
+ 2119  openssl s_client  -servername www.simple.org -cert ./certs/fred_new.crt -key ./certs/fred.key -CAfile ca/root-ca.crt  localhost:5555
+ 2120  openssl req -new --config etc/email.conf -out certs/colin.csr -keyout certs/colin.key
+ 2121  openssl ca -config etc/signing-ca.conf -in certs/colin.csr -out certs/colin.crt -extensions email_ext
+ 2122  openssl s_client  -servername www.simple.org -cert ./certs/colin.crt -key ./certs/colin.key -CAfile ca/root-ca.crt -prexit localhost:5555
+ 2124  openssl s_client  -servername www.simple.org -cert ./certs/fred_new.crt -key ./certs/fred.key -CAfile ca/root-ca.crt -prexit localhost:5555
+ 2125  openssl ca -gencrl -config etc/root-ca.conf -out crl/root-ca.crl
+ 2126  openssl s_client  -servername www.simple.org -cert ./certs/fred_new.crt -key ./certs/fred.key -CAfile ca/root-ca.crt -prexit localhost:5555
+ 2127  openssl s_client  -servername www.simple.org -cert ./certs/fred.crt -key ./certs/fred.key -CAfile ca/root-ca.crt -prexit localhost:5555
+ 2128  openssl s_client  -servername www.simple.org -cert ./certs/colin.crt -key ./certs/colin.key -CAfile ca/root-ca.crt -prexit localhost:5555
+ 2129  openssl s_client  -servername www.simple.org -cert ./certs/fred_new.crt -key ./certs/fred.key -CAfile ca/root-ca.crt -prexit localhost:5555
+ 2131  openssl crl -in crl/signing-ca.crl -noout -text
+ 2133  openssl ca -gencrl     -config etc/signing-ca.conf     -out crl/signing-ca.crl
+ 2134  openssl s_client  -servername www.simple.org -cert ./certs/fred_new.crt -key ./certs/fred.key -CAfile ca/root-ca.crt -prexit localhost:5555
+ 2135  openssl s_client  -servername www.simple.org -cert ./certs/fred.crt -key ./certs/fred.key -CAfile ca/root-ca.crt -prexit localhost:5555
+ 2136  openssl s_client  -servername www.simple.org -cert ./certs/colin.crt -key ./certs/colin.key -CAfile ca/root-ca.crt -prexit localhost:5555
