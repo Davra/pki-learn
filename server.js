@@ -2,18 +2,18 @@ const { createServer } = require('node:tls');
 const { readFileSync } = require('node:fs');
 
 const options = {
-  key: readFileSync('/home/colin/workspace/pki-example-1/certs/simple-org.key'),
-  cert: readFileSync('/home/colin/workspace/pki-example-1/fullchain.pem'),
+  key: readFileSync('certs/server.key'),
+  cert: readFileSync('certs/server_fullchain.pem'),
 
   // This is necessary only if using client certificate authentication.
   requestCert: true,
 
   // This is necessary only if the client uses a self-signed certificate.
-  ca: [ readFileSync('/home/colin/workspace/pki-example-1/ca_chain.pem') ],
+  ca: [ readFileSync('ca/ca_chain.pem') ],
 
   crl: [
-    readFileSync('/home/colin/workspace/pki-example-1/crl/signing-ca.crl'),
-    readFileSync('/home/colin/workspace/pki-example-1/crl/root-ca.crl'),
+    readFileSync('crl/signing-ca.crl'),
+    readFileSync('crl/root-ca.crl'),
   ]
 };
 
